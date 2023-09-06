@@ -1,17 +1,30 @@
 import { Link } from "react-router-dom";
-import { socket } from "../sicket";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import socket from "../socket";
 
 const HomePage = () => {
+  const [message, setMessage] = useState("");
   useEffect(() => {
     socket.on("message", (data) => {
-      console.log(data);
+      setMessage(data);
+      console.log("Received message from server:", data);
     });
+
+    // Clean up the socket connection when the component unmounts
+    return () => {
+      socket.off("message");
+    };
   }, []);
+
+  const sendMessage = () => {
+    console.log("click");
+    socket.emit("message", "I am resan");
+  };
   return (
     <div>
       <h1>home page</h1>
-      {/* <h2>massage {massage}</h2> */}
+      <button onClick={sendMessage}>Send message</button>
+      <h2>massage {message}</h2>
       <Link to={"/about"}>About page</Link>
     </div>
   );
